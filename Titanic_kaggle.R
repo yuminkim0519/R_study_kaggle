@@ -93,3 +93,55 @@ full <- full %>%
 ## 3.1 수치값을 활용한 data 확인
 str(full)
 summary(full)
+
+## 3.2 Missing values
+## 3.2.1 VIM packages
+VIM::aggr(full, 
+          prop      = FALSE,
+          combined  = TRUE,
+          numbers   = TRUE,
+          sortVars  = TRUE,
+          sortCombs = TRUE)
+
+## 3.2.2 tidyverse packages
+full %>% 
+  dplyr::summarize_all(funs(sum(is.na(.))/n()))
+
+missing_values <- full %>% 
+  dplyr::summarize_all(funs(sum(is.na(.))/n()))
+
+missing_values <- tidyr::gather(missing_values,
+                                key = "feature", value = "missing_pct")
+
+missing_values %>% 
+  ggplot(aes(x = reorder(feature, missing_pct),
+             y = missing_pct)) +
+  geom_bar(stat = "identity", fill = "red") +
+  ggtitle("Rate of missing values in each features") +
+  theme(plot.title = element_text(face = "bold",
+                                  hjust = .5,
+                                  size = 15,
+                                  color = "darkblue")) +
+  labs(x = "Feature names",
+       y = "Rate") +
+  coord_flip()
+
+# Using purrr package, pick the variable which has NA variable.
+miss_pct <- purrr::map_dbl(full, function(x){round((sum(is.na(x))/length(x))* 100, 1)})
+
+miss_pct <- miss_pct[miss_pct > 0]
+
+data.frame(miss = miss_pct,
+           var = names(miss_pct),
+           row.names = NULL) %>% 
+  ggplot(aes(x = reorder(var, miss),
+             y = miss)) +
+  geom_bar(stat = "identity", fill = "red") +
+  ggtitle("Rate of missing values") +
+  labs(x = 'Feature names',
+       y = 'Rate of missing values') +
+  theme(plot.title = element_text(face = "bold",
+                                  hjust = .5,
+                                  size = 15,
+                                  color = "darkblue")) +
+  coord_flip()
