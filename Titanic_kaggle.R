@@ -145,3 +145,4 @@ data.frame(miss = miss_pct,
                                   size = 15,
                                   color = "darkblue")) +
   coord_flip()
+ 
