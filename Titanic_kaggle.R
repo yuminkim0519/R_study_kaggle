@@ -146,3 +146,96 @@ data.frame(miss = miss_pct,
                                   color = "darkblue")) +
   coord_flip()
  
+### 3.3 AGE
+age.p1 <- full %>% 
+  ggplot(aes(Age)) +
+  geom_histogram(breaks = seq(0, 80, by = 1),   # 간격 설정
+                 col    = "red",                # 막대 경계선 색깔
+                 fill   = "green",              # 막대 내부 색깔
+                 alpha  = .5) +                # 막대 투명도 = 50%
+  ggtitle("All Titanic passengers age histogram") +
+  theme(plot.title = element_text(face  = "bold",
+                                  hjust = .5,
+                                  size  = 15,
+                                  color = "darkblue"))
+  
+age.p2 <- full %>% 
+  filter(!is.na(Survived)) %>% 
+  ggplot(aes(Age, fill = Survived)) +
+  geom_density(alpha = .3) +
+  ggtitle("Titanic passengers age density plot") +
+  theme(plot.title = element_text(face = "bold", hjust = .5,
+                                  size = 15, color = "darkblue"))
+
+# multiplot layout 형식 지정
+multi.layout = matrix(c(1, 1, 2, 2), 2, 2, byrow = TRUE)
+
+# 위에서 생성한 2개의 그래프 한 화면에 출력
+multiplot(age.p1, age.p2, layout = multi.layout)
+
+### 3.4 Pclass
+full %>% 
+  group_by(Pclass) %>% 
+  summarize(N = n()) %>% 
+  ggplot(aes(Pclass, N)) +
+  geom_col() +
+  geom_text(aes(label = N),   # Plot의 y에 해당하는 N(빈도수)를 매핑
+            size = 5,
+            vjust = 1.2,      # Vertical 위치 설정
+            color = "white") +
+  ggtitle("Number of each Pclass's passengers") +
+  theme(plot.title = element_text(face = "bold", hjust = .5, size = 15)) +
+  labs(x = "Plcass", y = "Count")
+
+### 3.5 Fare
+Fare.p1 <- full %>% 
+  ggplot(aes(Fare)) +
+  geom_histogram(col   = "yellow",
+                 fill  = "blue",
+                 alpha = .5) +
+  ggtitle("Histigram of passengers Fare")
+
+Fare.p2 <- full %>% 
+    filter(!is.na(Survived)) %>% 
+    ggplot(aes(Survived, Fare)) +
+    geom_jitter(col = "gray") +
+    geom_boxplot(alpha = .5) +
+    ggtitle("dvdv")
+
+
+multi.layout = matrix(c(1, 1, 2, 2), 2, 2)
+multiplot(Fare.p1, Fare.p2, layout = multi.layout)
+
+
+### 3.6 Sex
+sex.p1 <- full %>% 
+  group_by(Sex) %>% 
+  summarize(N = n()) %>% 
+  ggplot(aes(Sex, N)) +
+  geom_col() +
+  geom_text(aes(label = N), vjust = 1.2, color = "white", size = 5) +
+  labs(x = "Sex", y = "Count") +
+  ggtitle("Bar plot of Sex")
+
+sex.p2 <- full[1:891, ] %>% 
+  ggplot(aes(Sex, fill = Survived)) +
+  geom_bar(position = "fill") + 
+  scale_fill_brewer(palette = "Set1") +
+  scale_y_continuous(labels = percent) +
+  ggtitle("Survival Rate by Sex") + 
+  labs(x = "Sex", y = "Rate")
+  
+multi.layout = matrix(rep(c(1, 2), times = 2), 2, 2, byrow = T)
+multiplot(sex.p1, sex.p2, layout = multi.layout)
+
+# 모자이크 플롯
+mosaicplot(Survived ~ Sex,
+           data = full[1:891, ], col = TRUE,
+           main = "Survival rate by passengers gender")
+
+
+full %>% 
+  group_by(Sex, Survived) %>% 
+  filter(!is.na(Survived)) %>% 
+  summarize(N = n())
+ 
