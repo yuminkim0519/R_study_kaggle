@@ -238,4 +238,4 @@ full %>%
   group_by(Sex, Survived) %>% 
   filter(!is.na(Survived)) %>% 
   summarize(N = n())
- 
+  
